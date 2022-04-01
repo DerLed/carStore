@@ -1,4 +1,7 @@
 package com.example.demo8;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -46,6 +49,28 @@ public class conn {
     }
 
     // -------- Вывод таблицы--------
+    public static ObservableList<Car> ReadDBOut() throws ClassNotFoundException, SQLException
+    {
+        resSet = statmt.executeQuery("SELECT * FROM vehicle");
+        ObservableList<Car> carData1 = FXCollections.observableArrayList();
+
+        while(resSet.next())
+        {
+            int id = resSet.getInt("id");
+            String  brand = resSet.getString("brand");
+            String  model = resSet.getString("model");
+            String category = resSet.getString("category");
+            String registrationNumber = resSet.getString("registrationNumber");
+            String typeVehicle = resSet.getString("typeVehicle");
+            int year = resSet.getInt("year");
+            int hasTrailer = resSet.getInt("hasTrailer");
+
+            carData1.add(new Car(brand, model, category, registrationNumber, typeVehicle, year, false));
+        }
+
+        return carData1;
+    }
+
     public static void ReadDB() throws ClassNotFoundException, SQLException
     {
         resSet = statmt.executeQuery("SELECT * FROM vehicle");

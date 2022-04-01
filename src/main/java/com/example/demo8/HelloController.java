@@ -8,6 +8,8 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.sql.SQLException;
+
 public class HelloController {
     private ObservableList<User> usersData = FXCollections.observableArrayList();
     private ObservableList<Car> carData = FXCollections.observableArrayList();
@@ -52,7 +54,7 @@ public class HelloController {
     }
 
     @FXML
-    protected void initialize() {
+    protected void initialize() throws SQLException, ClassNotFoundException {
         initData();
 
         brandColumn.setCellValueFactory(new PropertyValueFactory<Car, String>("brand"));
@@ -71,7 +73,10 @@ public class HelloController {
 
     // подготавливаем данные для таблицы
     // вы можете получать их с базы данных
-    private void initData() {
-        carData.add(new Car("LADA", "Priora", "Спорткар", "А000АА00", "Легковая", 2008, false));
+    private void initData() throws SQLException, ClassNotFoundException {
+        //carData.add(new Car("LADA", "Priora", "Спорткар", "А000АА00", "Легковая", 2008, false));
+        conn.Conn();
+        carData = conn.ReadDBOut();
+        conn.CloseDB();
     }
 }
