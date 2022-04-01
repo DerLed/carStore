@@ -16,7 +16,7 @@ public class conn {
     {
         conn = null;
         Class.forName("org.sqlite.JDBC");
-        conn = DriverManager.getConnection("jdbc:sqlite:TEST1.s3db");
+        conn = DriverManager.getConnection("jdbc:sqlite:CAR.s3db");
 
         System.out.println("База Подключена!");
     }
@@ -25,7 +25,9 @@ public class conn {
     public static void CreateDB() throws ClassNotFoundException, SQLException
     {
         statmt = conn.createStatement();
-        statmt.execute("CREATE TABLE if not exists 'users' ('id' INTEGER PRIMARY KEY AUTOINCREMENT, 'name' text, 'phone' INT);");
+        statmt.execute("CREATE TABLE if not exists 'vehicle' ('id' INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "'brand' VARCHAR(50), 'model' VARCHAR(50), 'category' VARCHAR(50), 'registrationNumber' VARCHAR(15)," +
+                "'typeVehicle' VARCHAR(15), 'year' INT, hasTrailer INT(1));");
 
         System.out.println("Таблица создана или уже существует.");
     }
@@ -33,9 +35,12 @@ public class conn {
     // --------Заполнение таблицы--------
     public static void WriteDB() throws SQLException
     {
-        statmt.execute("INSERT INTO 'users' ('name', 'phone') VALUES ('Petya', 125453); ");
-        statmt.execute("INSERT INTO 'users' ('name', 'phone') VALUES ('Vasya', 321789); ");
-        statmt.execute("INSERT INTO 'users' ('name', 'phone') VALUES ('Masha', 456123); ");
+        statmt.execute("INSERT INTO 'vehicle' ('brand', 'model', 'category', 'registrationNumber', 'typeVehicle'," +
+                "'year', 'hasTrailer')" +
+                "VALUES ('ffff', 'f57', 'Кабриолет', 'Б111ББ11', 'Легковая', 2010, 0 ) ; ");
+        statmt.execute("INSERT INTO 'vehicle' ('brand', 'model', 'category', 'registrationNumber', 'typeVehicle'," +
+                "'year', 'hasTrailer')" +
+                "VALUES ('Опель', 'Инсигния', 'Кабриолет', 'В111ВВ11', 'Легковая', 2010, 0 ) ; ");
 
         System.out.println("Таблица заполнена");
     }
@@ -43,16 +48,27 @@ public class conn {
     // -------- Вывод таблицы--------
     public static void ReadDB() throws ClassNotFoundException, SQLException
     {
-        resSet = statmt.executeQuery("SELECT * FROM users");
+        resSet = statmt.executeQuery("SELECT * FROM vehicle");
 
         while(resSet.next())
         {
             int id = resSet.getInt("id");
-            String  name = resSet.getString("name");
-            String  phone = resSet.getString("phone");
+            String  brand = resSet.getString("brand");
+            String  model = resSet.getString("model");
+            String category = resSet.getString("category");
+            String registrationNumber = resSet.getString("registrationNumber");
+            String typeVehicle = resSet.getString("typeVehicle");
+            int year = resSet.getInt("year");
+            int hasTrailer = resSet.getInt("hasTrailer");
             System.out.println( "ID = " + id );
-            System.out.println( "name = " + name );
-            System.out.println( "phone = " + phone );
+            System.out.println( "Марка = " + brand);
+            System.out.println( "Модель = " + model);
+            System.out.println( "Категория = " + category);
+            System.out.println( "Номер ТС = " + registrationNumber);
+            System.out.println( "Тип ТС = " + typeVehicle);
+            System.out.println( "Год выпуска = " + year);
+            System.out.println( "Наличие прицепа = " + hasTrailer);
+
             System.out.println();
         }
 
