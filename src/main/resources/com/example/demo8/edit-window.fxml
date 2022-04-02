@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo8.EditWindowController">
+   <children>
+
+      <GridPane>
+
+         <children>
+            <Label text="Марка " GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Label text="Модель" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Label text="Категория" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <Label text="Государственный номер" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Label text="Тип ТС" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <Label text="Год выпуска" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+            <TextField fx:id="addBrandTextField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <TextField fx:id="addModelTextField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="addCategoryTextField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField  fx:id="addRegistrationNumberTextField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ChoiceBox fx:id="addTypeVehicleChoiceBox" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <TextField fx:id="addYearTextField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <CheckBox fx:id="hasTrailerCheckBox" alignment="CENTER" mnemonicParsing="false" text="Наличие прицепа" textOverrun="CLIP" GridPane.rowIndex="7" />
+
+         </children>
+         <columnConstraints>
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+
+      </GridPane>
+      <Button mnemonicParsing="false" onAction="#addButtonAction" text="Сохранить" />
+      <Button fx:id="closeButton" mnemonicParsing="false" onAction="#handleCloseButtonAction" text="Закрыть" />
+
+
+   </children>
+</VBox>

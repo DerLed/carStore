@@ -9,6 +9,19 @@ public abstract class Vehicle {
     private int year;
     private boolean hasTrailer;
 
+    @Override
+    public String toString() {
+        return "Vehicle{" +
+                "brand='" + brand + '\'' +
+                ", model='" + model + '\'' +
+                ", category='" + category + '\'' +
+                ", registrationNumber='" + registrationNumber + '\'' +
+                ", typeVehicle='" + typeVehicle + '\'' +
+                ", year=" + year +
+                ", hasTrailer=" + hasTrailer +
+                '}';
+    }
+
     public Vehicle(String brand, String model, String category, String registrationNumber, String typeVehicle, int year, boolean hasTrailer) {
         this.brand = brand;
         this.model = model;
@@ -17,6 +30,10 @@ public abstract class Vehicle {
         this.typeVehicle = typeVehicle;
         this.year = year;
         this.hasTrailer = hasTrailer;
+    }
+
+    public Vehicle(){
+
     }
 
     public String getBrand() {
