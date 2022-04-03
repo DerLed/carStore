@@ -33,6 +33,9 @@ public class EditWindowController implements Initializable {
     public TextField addYearTextField;
     public CheckBox hasTrailerCheckBox;
 
+    private boolean isUpdate = false;
+    private int idUpdate;
+    String sql = "";
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -45,14 +48,17 @@ public class EditWindowController implements Initializable {
 
     @FXML
     protected void handleCloseButtonAction() {
+        System.out.println(idUpdate);
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    protected void addButtonAction(ActionEvent actionEvent) {
+    protected void addButtonAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
+
 
         //Получаем значения из текстовых полей
+
         String brand = addBrandTextField.getText();
         String model = addModelTextField.getText();
         String category = addCategoryTextField.getText();
@@ -61,19 +67,33 @@ public class EditWindowController implements Initializable {
 
         //Проверяем что в поле "Год выпуска" введено число
         int year = 0;
-        try {
-            year = Integer.parseInt(addYearTextField.getText());
+        try { year = Integer.parseInt(addYearTextField.getText());
         } catch (NumberFormatException e) {
             //e.printStackTrace();
         }
         int hasTrailer = hasTrailerCheckBox.isSelected() ? 1 : 0;
 
+
         //Добавляем новую запись в БД
         try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB);) {
-            //Statement statement = connectionDB.createStatement();
-            String sql = "INSERT INTO 'vehicle' ('brand', 'model', 'category', 'registrationNumber', 'typeVehicle', " +
+
+            String updateSql = "UPDATE vehicle SET brand = ?, model = ?, category = ?, " +
+                    "registrationNumber = ?, typeVehicle = ?, year = ?, " +
+                    "hasTrailer = ? WHERE id = "+ idUpdate +" ;";
+
+            String addSql = "INSERT INTO 'vehicle' ('brand', 'model', 'category', 'registrationNumber', 'typeVehicle', " +
                     "'year', 'hasTrailer') VALUES (?, ?, ?, ?, ?, ?, ? ) ;";
+
+            if(isUpdate)
+                sql = updateSql;
+            else
+                sql = addSql;
+
+
+
             PreparedStatement preparedStatement = connectionDB.prepareStatement(sql);
+
+
             preparedStatement.setString(1, brand);
             preparedStatement.setString(2, model);
             preparedStatement.setString(3, category);
@@ -82,17 +102,24 @@ public class EditWindowController implements Initializable {
             preparedStatement.setInt(6, year);
             preparedStatement.setInt(7, hasTrailer);
 
-            if (!checkRegistrationNumber(registrationNumber)) {
+            if (!checkRegistrationNumber(registrationNumber) | isUpdate) {
                 int rows = preparedStatement.executeUpdate();
                 System.out.printf("%d rows added", rows);
             }
             else
                 System.out.println("Номер существует");
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
+        
     }
+
+    /**
+     * Функция проверки совпадения регистрационного номера
+     */
     private boolean checkRegistrationNumber(String registrationNumber){
         boolean isRegistrationNumberExist = false;
         try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB);) {
@@ -109,23 +136,27 @@ public class EditWindowController implements Initializable {
         return isRegistrationNumberExist;
     }
 
+    /**
+     * Функция для передачи значения между контроллерами(окнами)
+     * выполняется только при редактировании записи,
+     * вызывается в обработчике кнопки "Редактировать запись"
+     */
     public void setSelectRowCar(Vehicle selectRowCar) {
-
+        //Устанавливаем переменную isUpdate в true если передана какая либо запись на редактиорвание
+        //И получаем id записи которую будем редактировать
+        if (selectRowCar.getId() > 0) isUpdate = true;
+        idUpdate = selectRowCar.getId();
+        //Заполняем все поля формы полученными значениями
         addBrandTextField.setText(selectRowCar.getBrand());
         addModelTextField.setText(selectRowCar.getModel());
         addCategoryTextField.setText(selectRowCar.getCategory());
         addRegistrationNumberTextField.setText(selectRowCar.getRegistrationNumber());
         hasTrailerCheckBox.setSelected(selectRowCar.isHasTrailer());
-        if(selectRowCar.getYear() == 0) {
-            addYearTextField.setText("");
-        }
-        else
-            addYearTextField.setText(String.valueOf(selectRowCar.getYear()));
-//        ObservableList<String> st = FXCollections.observableArrayList();
-//        for(TypeVehicle tt : TypeVehicle.values()){
-//            st.add(tt.getType());
+//        if(selectRowCar.getYear() == 0) {
+//            addYearTextField.setText("");
 //        }
-//        addTypeVehicleChoiceBox.setItems(st);
+//        else
+        addYearTextField.setText(String.valueOf(selectRowCar.getYear()));
         addTypeVehicleChoiceBox.setValue(selectRowCar.getTypeVehicle());
     }
 }

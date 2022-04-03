@@ -3,6 +3,7 @@ package com.example.demo8;
 import java.util.Objects;
 
 public abstract class Vehicle {
+    private int id = -1;
     private String brand;
     private String model;
     private String category;
@@ -24,7 +25,8 @@ public abstract class Vehicle {
                 '}';
     }
 
-    public Vehicle(String brand, String model, String category, String registrationNumber, int year, boolean hasTrailer) {
+    public Vehicle(int id, String brand, String model, String category, String registrationNumber, int year, boolean hasTrailer) {
+        this.id = id;
         this.brand = brand;
         this.model = model;
         this.category = category;
@@ -37,6 +39,8 @@ public abstract class Vehicle {
     public Vehicle(){
 
     }
+
+    public int getId() {return id;};
 
     public String getBrand() {
         return brand;

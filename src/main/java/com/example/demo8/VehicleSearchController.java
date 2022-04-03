@@ -32,7 +32,7 @@ import java.util.ResourceBundle;
 import static com.example.demo8.Settings.PATHSQLDB;
 
 
-public class VehicleSearchController implements Initializable {
+public class VehicleSearchController {
     @FXML
     public TextField findBrandTextField;
     @FXML
@@ -48,6 +48,9 @@ public class VehicleSearchController implements Initializable {
 
     //Переменная для хранения выбраной строки
     private Vehicle selectRowCar;
+
+    private FXMLLoader fxmlLoader;
+    private Stage stage;
 
 
     @FXML
@@ -67,36 +70,39 @@ public class VehicleSearchController implements Initializable {
     @FXML
     private TableColumn<Vehicle, String> hasTrailerColumn;
 
-    private ObservableList<Vehicle> carData = FXCollections.observableArrayList();
 
     @FXML
     protected void addButtonClick() {
-        CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
-        newWindow.createWindowAddUpdate();
+        //CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
+        //newWindow.createWindowAddUpdate();
+        createWindowAddUpdate();
 
     }
 
     @FXML
     protected void updateButtonClick() {
-        CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
-        newWindow.createWindowAddUpdate(selectRowCar);
+        //CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
+        //newWindow.createWindowAddUpdate(selectRowCar);
+        createWindowAddUpdate(selectRowCar);
     }
 
 
+    @FXML
+    public void initialize() {
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        ObservableList<Vehicle> carData = FXCollections.observableArrayList();
+
         String sqlRequest = "SELECT * FROM vehicle";
-
-
         try {
             //Class.forName("org.sqlite.JDBC");
             Connection connectionDB = DriverManager.getConnection(PATHSQLDB);
             Statement statement = connectionDB.createStatement();
+
             ResultSet queryOutput = statement.executeQuery(sqlRequest);
 
             while (queryOutput.next()) {
-                Integer id = queryOutput.getInt("id");
+                int id = queryOutput.getInt("id");
                 String brand = queryOutput.getString("brand");
                 String model = queryOutput.getString("model");
                 String category = queryOutput.getString("category");
@@ -107,7 +113,7 @@ public class VehicleSearchController implements Initializable {
 
                 //carData.add(new Car(brand, model, category, registrationNumber, year, hasTrailer));
                 VehicleFactory vehicleFactory = new VehicleFactory();
-                carData.add(vehicleFactory.createVehicle(typeVehicle, brand, model, category, registrationNumber, year, hasTrailer));
+                carData.add(vehicleFactory.createVehicle(typeVehicle, id, brand, model, category, registrationNumber, year, hasTrailer));
 
                 brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
                 modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
@@ -116,7 +122,7 @@ public class VehicleSearchController implements Initializable {
                 typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
 
                 yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
-//
+
                 hasTrailerColumn.setCellValueFactory(cellData -> {
                     boolean isHasTrailer = cellData.getValue().isHasTrailer();
                     String hasTrailerAsString;
@@ -125,58 +131,33 @@ public class VehicleSearchController implements Initializable {
                     return new ReadOnlyStringWrapper(hasTrailerAsString);
                 });
 
-                vehicleList.setItems(carData);
+                //vehicleList.setItems(carData);
             }
-
-//            FilteredList<Car> filteredCarData = new FilteredList<>(carData, b -> true);
-            FilteredList<Vehicle> filteredCarData = new FilteredList<>(carData);
-
-//            findBrandTextField.textProperty().addListener((observable, oldValue, newValue) ->{
-//                filteredCarData.setPredicate(Car -> {
-//                    if(newValue.isEmpty() || newValue.isBlank()){
-//                        return true;
-//                    }
-//                    String searchKeyword = newValue.toLowerCase();
-//                    return Car.getBrand().toLowerCase().contains(searchKeyword);
-//                });
-//            });
-
-//            findModelTextField.textProperty().addListener((observable, oldValue, newValue) ->{
-//                filteredCarData.setPredicate(Car -> {
-//                    if(newValue.isEmpty() || newValue.isBlank()){
-//                        return true;
-//                    }
-//                    String searchKeyword = newValue.toLowerCase();
-//                    return Car.getModel().toLowerCase().contains(searchKeyword);
-//                });
-//            });
-
-
-
-
-            //Поиск по колонкам
-            filteredCarData.predicateProperty().bind(Bindings.createObjectBinding(() ->
-                    Car -> Car.getBrand().toLowerCase().contains(findBrandTextField.getText().toLowerCase())
-                    && Car.getModel().toLowerCase().contains(findModelTextField.getText().toLowerCase())
-                    && Car.getCategory().toLowerCase().startsWith(findCategoryTextField.getText().toLowerCase())
-                    && Car.getRegistrationNumber().toLowerCase().contains(findRegistrationNumberTextField.getText().toLowerCase())
-                    && String.valueOf(Car.getYear()).startsWith(findYearTextField.getText()),
-
-                    findBrandTextField.textProperty(),
-                    findModelTextField.textProperty(),
-                    findCategoryTextField.textProperty(),
-                    findRegistrationNumberTextField.textProperty(),
-                    findYearTextField.textProperty()
-                    ));
-
-
-
-
-            vehicleList.setItems(filteredCarData);
-
-        } catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
+
+
+        //Поиск по колонкам
+        FilteredList<Vehicle> filteredCarData = new FilteredList<>(carData);
+
+        filteredCarData.predicateProperty().bind(Bindings.createObjectBinding(() ->
+                        Car -> Car.getBrand().toLowerCase().contains(findBrandTextField.getText().toLowerCase())
+                                && Car.getModel().toLowerCase().contains(findModelTextField.getText().toLowerCase())
+                                && Car.getCategory().toLowerCase().startsWith(findCategoryTextField.getText().toLowerCase())
+                                && Car.getRegistrationNumber().toLowerCase().contains(findRegistrationNumberTextField.getText().toLowerCase())
+                                && String.valueOf(Car.getYear()).startsWith(findYearTextField.getText()),
+
+                findBrandTextField.textProperty(),
+                findModelTextField.textProperty(),
+                findCategoryTextField.textProperty(),
+                findRegistrationNumberTextField.textProperty(),
+                findYearTextField.textProperty()
+        ));
+        vehicleList.setItems(filteredCarData);
+
 
         //Выбор значения в таблице
         vehicleList.getSelectionModel().selectedItemProperty().addListener(
@@ -185,12 +166,46 @@ public class VehicleSearchController implements Initializable {
                     if (newValue == null) {
                         updateButton.setDisable(true);
                         selectRowCar = null;
-                    }
-                    else {
+                    } else {
                         updateButton.setDisable(false);
                         selectRowCar = newValue;
                         System.out.println(newValue.getModel());
+
                     }
                 });
+
+
+    }
+
+    private void initWindow() {
+        fxmlLoader = new FXMLLoader(getClass().getResource("edit-window.fxml"));
+        Parent root = null;
+        try {
+            root = fxmlLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        assert root != null;
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.setOnHiding(e -> {
+            initialize();
+        });
+    }
+
+    public void createWindowAddUpdate() {
+        initWindow();
+        stage.setTitle("Добавление записи");
+        stage.show();
+    }
+
+    public void createWindowAddUpdate(Vehicle selectRowCar) {
+        initWindow();
+        EditWindowController editWindowController = fxmlLoader.getController();
+        editWindowController.setSelectRowCar(selectRowCar);
+        stage.setTitle("Редактирование записи");
+        stage.show();
     }
 }
