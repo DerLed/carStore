@@ -47,6 +47,7 @@ public class VehicleSearchController {
     public Button updateButton;
 
     ObservableList<Vehicle> vehicleData = FXCollections.observableArrayList();
+    FilteredList<Vehicle> filteredCarData = new FilteredList<>(vehicleData);
 
     //Переменная для хранения выбраной строки
     private Vehicle selectRowCar;
@@ -89,6 +90,7 @@ public class VehicleSearchController {
     @FXML
     public void initialize() {
         updateDB();
+        vehicleList.setItems(vehicleData);
 
         for (Vehicle v : vehicleData){
             brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
@@ -106,28 +108,10 @@ public class VehicleSearchController {
             });
         }
 
-        //Поиск по колонкам
-        FilteredList<Vehicle> filteredCarData = new FilteredList<>(vehicleData);
-
-        filteredCarData.predicateProperty().bind(Bindings.createObjectBinding(() ->
-                        Car -> Car.getBrand().toLowerCase().contains(findBrandTextField.getText().toLowerCase())
-                                && Car.getModel().toLowerCase().contains(findModelTextField.getText().toLowerCase())
-                                && Car.getCategory().toLowerCase().startsWith(findCategoryTextField.getText().toLowerCase())
-                                && Car.getRegistrationNumber().toLowerCase().contains(findRegistrationNumberTextField.getText().toLowerCase())
-                                && String.valueOf(Car.getYear()).startsWith(findYearTextField.getText()),
-
-                findBrandTextField.textProperty(),
-                findModelTextField.textProperty(),
-                findCategoryTextField.textProperty(),
-                findRegistrationNumberTextField.textProperty(),
-                findYearTextField.textProperty()
-        ));
-
-        vehicleList.setItems(filteredCarData);
+        findValue();
 
 
         //Выбор значения в таблице
-
         vehicleList.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
 
@@ -157,10 +141,8 @@ public class VehicleSearchController {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setOnHiding(e -> {
-            //initialize();
             updateDB();
-            //vehicleList.refresh();
-            vehicleList.setItems(vehicleData);
+            findValue();
         });
     }
 
@@ -200,24 +182,31 @@ public class VehicleSearchController {
                 VehicleFactory vehicleFactory = new VehicleFactory();
                 carData.add(vehicleFactory.createVehicle(typeVehicle, id, brand, model, category, registrationNumber, year, hasTrailer));
 
-//                brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
-//                modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
-//                categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-//                registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<>("registrationNumber"));
-//                typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
-//                yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
-//                hasTrailerColumn.setCellValueFactory(cellData -> {
-//                    boolean isHasTrailer = cellData.getValue().isHasTrailer();
-//                    String hasTrailerAsString;
-//                    if (isHasTrailer) hasTrailerAsString = "Да";
-//                    else hasTrailerAsString = "Нет";
-//                    return new ReadOnlyStringWrapper(hasTrailerAsString);
-//                });
-
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         vehicleData = carData;
+    }
+
+    public void findValue(){
+        //Поиск по колонкам
+        filteredCarData = new FilteredList<>(vehicleData);
+
+        filteredCarData.predicateProperty().bind(Bindings.createObjectBinding(() ->
+                        Car -> Car.getBrand().toLowerCase().contains(findBrandTextField.getText().toLowerCase())
+                                && Car.getModel().toLowerCase().contains(findModelTextField.getText().toLowerCase())
+                                && Car.getCategory().toLowerCase().startsWith(findCategoryTextField.getText().toLowerCase())
+                                && Car.getRegistrationNumber().toLowerCase().contains(findRegistrationNumberTextField.getText().toLowerCase())
+                                && String.valueOf(Car.getYear()).startsWith(findYearTextField.getText()),
+
+                findBrandTextField.textProperty(),
+                findModelTextField.textProperty(),
+                findCategoryTextField.textProperty(),
+                findRegistrationNumberTextField.textProperty(),
+                findYearTextField.textProperty()
+        ));
+
+        vehicleList.setItems(filteredCarData);
     }
 }

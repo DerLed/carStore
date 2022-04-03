@@ -6,12 +6,11 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
-public class HelloApplication extends Application {
+public class CarStoreApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("root-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(CarStoreApplication.class.getResource("root-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
         stage.setTitle("Справочник транспорта");
         stage.setScene(scene);
