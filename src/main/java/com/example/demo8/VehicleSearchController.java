@@ -46,6 +46,8 @@ public class VehicleSearchController {
     @FXML
     public Button updateButton;
 
+    ObservableList<Vehicle> vehicleData = FXCollections.observableArrayList();
+
     //Переменная для хранения выбраной строки
     private Vehicle selectRowCar;
 
@@ -53,8 +55,10 @@ public class VehicleSearchController {
     private Stage stage;
 
 
+
+
     @FXML
-    private TableView<Vehicle> vehicleList;
+    private TableView<Vehicle> vehicleList = new TableView<>(vehicleData);
     @FXML
     private TableColumn<Vehicle, String> brandColumn;
     @FXML
@@ -84,49 +88,26 @@ public class VehicleSearchController {
 
     @FXML
     public void initialize() {
-        ObservableList<Vehicle> carData = FXCollections.observableArrayList();
+        updateDB();
 
-        String sqlRequest = "SELECT * FROM vehicle";
-        try {
-            Connection connectionDB = DriverManager.getConnection(PATHSQLDB);
-            Statement statement = connectionDB.createStatement();
-            ResultSet queryOutput = statement.executeQuery(sqlRequest);
-
-            while (queryOutput.next()) {
-                int id = queryOutput.getInt("id");
-                String brand = queryOutput.getString("brand");
-                String model = queryOutput.getString("model");
-                String category = queryOutput.getString("category");
-                String registrationNumber = queryOutput.getString("registrationNumber");
-                TypeVehicle typeVehicle = TypeVehicle.getTypeByName(queryOutput.getString("typeVehicle"));
-                int year = queryOutput.getInt("year");
-                boolean hasTrailer = queryOutput.getInt("hasTrailer") == 1;
-
-                VehicleFactory vehicleFactory = new VehicleFactory();
-                carData.add(vehicleFactory.createVehicle(typeVehicle, id, brand, model, category, registrationNumber, year, hasTrailer));
-
-                brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
-                modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
-                categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-                registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<>("registrationNumber"));
-                typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
-                yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
-                hasTrailerColumn.setCellValueFactory(cellData -> {
-                    boolean isHasTrailer = cellData.getValue().isHasTrailer();
-                    String hasTrailerAsString;
-                    if (isHasTrailer) hasTrailerAsString = "Да";
-                    else hasTrailerAsString = "Нет";
-                    return new ReadOnlyStringWrapper(hasTrailerAsString);
-                });
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        for (Vehicle v : vehicleData){
+            brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
+            modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
+            categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+            registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<>("registrationNumber"));
+            typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
+            yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
+            hasTrailerColumn.setCellValueFactory(cellData -> {
+                boolean isHasTrailer = cellData.getValue().isHasTrailer();
+                String hasTrailerAsString;
+                if (isHasTrailer) hasTrailerAsString = "Да";
+                else hasTrailerAsString = "Нет";
+                return new ReadOnlyStringWrapper(hasTrailerAsString);
+            });
         }
 
-
         //Поиск по колонкам
-        FilteredList<Vehicle> filteredCarData = new FilteredList<>(carData);
+        FilteredList<Vehicle> filteredCarData = new FilteredList<>(vehicleData);
 
         filteredCarData.predicateProperty().bind(Bindings.createObjectBinding(() ->
                         Car -> Car.getBrand().toLowerCase().contains(findBrandTextField.getText().toLowerCase())
@@ -146,6 +127,7 @@ public class VehicleSearchController {
 
 
         //Выбор значения в таблице
+
         vehicleList.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
 
@@ -175,7 +157,10 @@ public class VehicleSearchController {
         Scene scene = new Scene(root);
         stage.setScene(scene);
         stage.setOnHiding(e -> {
-            initialize();
+            //initialize();
+            updateDB();
+            //vehicleList.refresh();
+            vehicleList.setItems(vehicleData);
         });
     }
 
@@ -191,5 +176,48 @@ public class VehicleSearchController {
         editWindowController.setSelectRowCar(selectRowCar);
         stage.setTitle("Редактирование записи");
         stage.show();
+    }
+
+    private void updateDB(){
+        ObservableList<Vehicle> carData = FXCollections.observableArrayList();
+
+        String sqlRequest = "SELECT * FROM vehicle";
+        try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB)) {
+
+            Statement statement = connectionDB.createStatement();
+            ResultSet queryOutput = statement.executeQuery(sqlRequest);
+
+            while (queryOutput.next()) {
+                int id = queryOutput.getInt("id");
+                String brand = queryOutput.getString("brand");
+                String model = queryOutput.getString("model");
+                String category = queryOutput.getString("category");
+                String registrationNumber = queryOutput.getString("registrationNumber");
+                TypeVehicle typeVehicle = TypeVehicle.getTypeByName(queryOutput.getString("typeVehicle"));
+                int year = queryOutput.getInt("year");
+                boolean hasTrailer = queryOutput.getInt("hasTrailer") == 1;
+
+                VehicleFactory vehicleFactory = new VehicleFactory();
+                carData.add(vehicleFactory.createVehicle(typeVehicle, id, brand, model, category, registrationNumber, year, hasTrailer));
+
+//                brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
+//                modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
+//                categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+//                registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<>("registrationNumber"));
+//                typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
+//                yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
+//                hasTrailerColumn.setCellValueFactory(cellData -> {
+//                    boolean isHasTrailer = cellData.getValue().isHasTrailer();
+//                    String hasTrailerAsString;
+//                    if (isHasTrailer) hasTrailerAsString = "Да";
+//                    else hasTrailerAsString = "Нет";
+//                    return new ReadOnlyStringWrapper(hasTrailerAsString);
+//                });
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        vehicleData = carData;
     }
 }

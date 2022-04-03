@@ -73,7 +73,7 @@ public class EditWindowController implements Initializable {
 
 
         //Добавляем новую запись в БД
-        try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB);) {
+        try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB)) {
 
             String updateSql = "UPDATE vehicle SET brand = ?, model = ?, category = ?, " +
                     "registrationNumber = ?, typeVehicle = ?, year = ?, " +
