@@ -36,7 +36,11 @@ public class EditWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        ObservableList<String> st = FXCollections.observableArrayList();
+        for(TypeVehicle tt : TypeVehicle.values()){
+            st.add(tt.getType());
+        }
+        addTypeVehicleChoiceBox.setItems(st);
     }
 
     @FXML
@@ -53,8 +57,8 @@ public class EditWindowController implements Initializable {
         String model = addModelTextField.getText();
         String category = addCategoryTextField.getText();
         String registrationNumber = addRegistrationNumberTextField.getText();
-        //String typeVehicle = addTypeVehicleChoiceBox.get
-        String typeVehicle = "Легковая";
+        String typeVehicle = addTypeVehicleChoiceBox.getValue();
+
         //Проверяем что в поле "Год выпуска" введено число
         int year = 0;
         try {
@@ -112,16 +116,16 @@ public class EditWindowController implements Initializable {
         addCategoryTextField.setText(selectRowCar.getCategory());
         addRegistrationNumberTextField.setText(selectRowCar.getRegistrationNumber());
         hasTrailerCheckBox.setSelected(selectRowCar.isHasTrailer());
-        if(selectRowCar.equals(new Car())) {
+        if(selectRowCar.getYear() == 0) {
             addYearTextField.setText("");
         }
         else
             addYearTextField.setText(String.valueOf(selectRowCar.getYear()));
-        ObservableList<String> st = FXCollections.observableArrayList();
-        for(TypeVehicle tt : TypeVehicle.values()){
-            st.add(tt.getType());
-        }
-        addTypeVehicleChoiceBox.setItems(st);
+//        ObservableList<String> st = FXCollections.observableArrayList();
+//        for(TypeVehicle tt : TypeVehicle.values()){
+//            st.add(tt.getType());
+//        }
+//        addTypeVehicleChoiceBox.setItems(st);
         addTypeVehicleChoiceBox.setValue(selectRowCar.getTypeVehicle());
     }
 }

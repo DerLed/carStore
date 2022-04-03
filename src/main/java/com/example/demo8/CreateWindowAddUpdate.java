@@ -10,50 +10,18 @@ import java.io.IOException;
 
 public class CreateWindowAddUpdate {
     private FXMLLoader fxmlLoader;
-    private Parent root;
     private Stage stage;
-    private Scene scene;
 
     public void createWindowAddUpdate() {
-//        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("edit-window.fxml"));
-//        Parent root = null;
-//        try {
-//            root = fxmlLoader.load();
-//        }
-//        catch (IOException e){
-//            e.printStackTrace();
-//        }
-//        Stage stage = new Stage();
-//        stage.initModality(Modality.APPLICATION_MODAL);
-//        assert root != null;
-//        Scene scene = new Scene(root);
-//        stage.setScene(scene);
         initWindow();
         stage.setTitle("Добавление записи");
         stage.show();
     }
 
     public void createWindowAddUpdate(Vehicle selectRowCar) {
-//        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("edit-window.fxml"));
-//        Parent root = null;
-//        try {
-//            root = fxmlLoader.load();
-//        }
-//        catch (IOException e){
-//            e.printStackTrace();
-//        }
-//        Stage stage = new Stage();
-//        stage.initModality(Modality.APPLICATION_MODAL);
-//        assert root != null;
-//        Scene scene = new Scene(root);
-//        stage.setScene(scene);
         initWindow();
-
         EditWindowController editWindowController = fxmlLoader.getController();
         editWindowController.setSelectRowCar(selectRowCar);
-
-
-
         stage.setTitle("Редактирование записи");
         stage.show();
     }
@@ -61,7 +29,7 @@ public class CreateWindowAddUpdate {
 
     private void initWindow(){
         fxmlLoader = new FXMLLoader(getClass().getResource("edit-window.fxml"));
-        root = null;
+        Parent root = null;
         try {
             root = fxmlLoader.load();
         }
@@ -71,7 +39,7 @@ public class CreateWindowAddUpdate {
         stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         assert root != null;
-        scene = new Scene(root);
+        Scene scene = new Scene(root);
         stage.setScene(scene);
     }
 }

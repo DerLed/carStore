@@ -33,33 +33,39 @@ import static com.example.demo8.Settings.PATHSQLDB;
 
 
 public class VehicleSearchController implements Initializable {
-
+    @FXML
     public TextField findBrandTextField;
+    @FXML
     public TextField findModelTextField;
+    @FXML
     public TextField findRegistrationNumberTextField;
+    @FXML
     public TextField findCategoryTextField;
+    @FXML
     public TextField findYearTextField;
+    @FXML
     public Button updateButton;
-    private static Vehicle selectRowCar;
+
+    //Переменная для хранения выбраной строки
+    private Vehicle selectRowCar;
 
 
     @FXML
     private TableView<Vehicle> vehicleList;
     @FXML
-    private TableColumn<Car, String> brandColumn;
+    private TableColumn<Vehicle, String> brandColumn;
     @FXML
-    private TableColumn<Car, String> modelColumn;
+    private TableColumn<Vehicle, String> modelColumn;
     @FXML
-    private TableColumn<Car, String> categoryColumn;
+    private TableColumn<Vehicle, String> categoryColumn;
     @FXML
-    private TableColumn<Car, String> registrationNumberColumn;
+    private TableColumn<Vehicle, String> registrationNumberColumn;
     @FXML
-    private TableColumn<Car, String> typeVehicleColumn;
+    private TableColumn<Vehicle, String> typeVehicleColumn;
     @FXML
-    private TableColumn<Car, Integer> yearColumn;
+    private TableColumn<Vehicle, Integer> yearColumn;
     @FXML
-    //private TableColumn<Car, Boolean> hasTrailerColumn;
-    private TableColumn<Car, String> hasTrailerColumn;
+    private TableColumn<Vehicle, String> hasTrailerColumn;
 
     private ObservableList<Vehicle> carData = FXCollections.observableArrayList();
 
