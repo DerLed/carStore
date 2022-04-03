@@ -1,7 +1,9 @@
-package com.example.demo8;
+package com.example.carStore;
 
-import java.util.Objects;
-
+/**
+ * Перечисление для хранения катерорий ТС
+ *
+ */
 public enum TypeVehicle {
     BIKE("Мотоцикл"),
     CAR("Легковая"),
@@ -13,9 +15,12 @@ public enum TypeVehicle {
     }
     public String getType() {return type;}
 
+    /**
+     * Метод принимает строковое отображение категории и возвращает
+     * соотвествующее поле перечисления
+     */
     public static TypeVehicle getTypeByName(String code){
         for(TypeVehicle e : TypeVehicle.values()){
-            String у = e.getType();
             if(e.getType().equals(code))
                 return e;
         }

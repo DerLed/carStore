@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo8.VehicleSearchController">
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.carStore.VehicleSearchController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
@@ -12,13 +12,13 @@
 
     <TableView fx:id="vehicleList" layoutX="67.0" layoutY="11.0" prefHeight="200.0" prefWidth="200.0">
         <columns>
-            <TableColumn fx:id="brandColumn" prefWidth="75.0" text="Марка" />
-            <TableColumn fx:id="modelColumn" prefWidth="75.0" text="Модель" />
-            <TableColumn fx:id="categoryColumn" prefWidth="75.0" text="Категория" />
-            <TableColumn fx:id="registrationNumberColumn" prefWidth="75.0" text="Номер ТС" />
-            <TableColumn fx:id="typeVehicleColumn" prefWidth="75.0" text="Тип ТС" />
-            <TableColumn fx:id="yearColumn" prefWidth="75.0" text="Год выпуска" />
-            <TableColumn fx:id="hasTrailerColumn" prefWidth="75.0" text="Наличие прицепа" />
+            <TableColumn fx:id="brandColumn" minWidth="15.0" prefWidth="100.0" text="Марка" />
+            <TableColumn fx:id="modelColumn" minWidth="15.0" prefWidth="100.0" text="Модель" />
+            <TableColumn fx:id="categoryColumn" prefWidth="100.0" text="Категория" />
+            <TableColumn fx:id="registrationNumberColumn" prefWidth="100.0" text="Номер ТС" />
+            <TableColumn fx:id="typeVehicleColumn" prefWidth="100.0" text="Тип ТС" />
+            <TableColumn fx:id="yearColumn" prefWidth="100.0" text="Год выпуска" />
+            <TableColumn fx:id="hasTrailerColumn" prefWidth="100.0" text="Наличие прицепа" />
         </columns>
     </TableView>
     <HBox prefHeight="100.0" prefWidth="200.0">
@@ -41,7 +41,7 @@
                     <TextField fx:id="findCategoryTextField" />
                 </children>
             </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="200.0" prefWidth="180.0">
                 <children>
                     <Label text="Государственный номер" />
                     <TextField fx:id="findRegistrationNumberTextField" />
@@ -56,6 +56,6 @@
         </children>
     </HBox>
     <Button mnemonicParsing="false" onAction="#addButtonClick" text="Добавить ТС" />
-    <Button fx:id="updateButton"  onAction="#updateButtonClick" disable="true" mnemonicParsing="false" text="Редактировать ТС" />
+    <Button fx:id="updateButton" disable="true" mnemonicParsing="false" onAction="#updateButtonClick" text="Редактировать ТС" />
 
 </VBox>

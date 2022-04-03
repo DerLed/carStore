@@ -1,4 +1,4 @@
-package com.example.demo8;
+package com.example.carStore;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,14 +11,13 @@ public class CarStoreApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(CarStoreApplication.class.getResource("root-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Scene scene = new Scene(fxmlLoader.load(), 800, 600);
         stage.setTitle("Справочник транспорта");
         stage.setScene(scene);
         stage.show();
     }
 
     public static void main(String[] args) {
-
         launch();
     }
 }

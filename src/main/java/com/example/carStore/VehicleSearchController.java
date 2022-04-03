@@ -1,17 +1,12 @@
-package com.example.demo8;
+package com.example.carStore;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -23,13 +18,9 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 import java.sql.*;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
-import static com.example.demo8.Settings.PATHSQLDB;
+import static com.example.carStore.Settings.PATHSQLDB;
 
 
 public class VehicleSearchController {
@@ -55,6 +46,10 @@ public class VehicleSearchController {
     private FXMLLoader fxmlLoader;
     private Stage stage;
 
+    public static Connection connectionDB;
+    public static Statement statement;
+    public static ResultSet queryOutput;
+
 
 
 
@@ -75,13 +70,17 @@ public class VehicleSearchController {
     @FXML
     private TableColumn<Vehicle, String> hasTrailerColumn;
 
-
+    /**
+     * Обработчик нажатия кнопки добавления новой записи
+     */
     @FXML
     protected void addButtonClick() {
         createWindowAddUpdate();
-
     }
 
+    /**
+     * Обработчик нажатия кнопки редактирования
+     */
     @FXML
     protected void updateButtonClick() {
         createWindowAddUpdate(selectRowCar);
@@ -89,9 +88,10 @@ public class VehicleSearchController {
 
     @FXML
     public void initialize() {
+        //Обновление записей при первом запуске приложения
         updateDB();
-        vehicleList.setItems(vehicleData);
 
+        //Заполнение стлобцов таблице получеными значениями
         for (Vehicle v : vehicleData){
             brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
             modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
@@ -99,6 +99,7 @@ public class VehicleSearchController {
             registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<>("registrationNumber"));
             typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
             yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
+            //Здесь для для удобного чтения данных в таблице булевые преобразуются в соответсвующие строковые значения
             hasTrailerColumn.setCellValueFactory(cellData -> {
                 boolean isHasTrailer = cellData.getValue().isHasTrailer();
                 String hasTrailerAsString;
@@ -110,8 +111,11 @@ public class VehicleSearchController {
 
         findValue();
 
-
         //Выбор значения в таблице
+        //запускается "слушатель" выбранной строки в таблице
+        //при каждом новом выборе строки записывает данные строки в переменную
+        //или очищает ее если ничего не выбрано
+        //для того что бы при попытке редактирования, если ничего не выбрано не было ошибок
         vehicleList.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
 
@@ -127,6 +131,14 @@ public class VehicleSearchController {
                 });
     }
 
+    /**
+     * Метод инициализирует новое окно для редактирования или добаления нового ТС
+     * вынесен отдельно для возможности перегрузки метода запуска окна отдельно
+     * для редактирования и отдельно для добавления
+     * Так же в методе запускается событие на закрытие дочернего окна
+     * после закрытия дочернего окна, обновляются данные для отображения в таблице
+     * и каждый раз запускается метод для осуществления поиска
+     */
     private void initWindow() {
         fxmlLoader = new FXMLLoader(getClass().getResource("edit-window.fxml"));
         Parent root = null;
@@ -146,12 +158,19 @@ public class VehicleSearchController {
         });
     }
 
+    /**
+     * Метод запускает окно добавления записи
+     */
     public void createWindowAddUpdate() {
         initWindow();
         stage.setTitle("Добавление записи");
         stage.show();
     }
 
+    /**
+     *Метод запускает окно редактирования записи
+     * принимает переменную хранящую данные выбраной строки в даблице
+     */
     public void createWindowAddUpdate(Vehicle selectRowCar) {
         initWindow();
         EditWindowController editWindowController = fxmlLoader.getController();
@@ -160,14 +179,23 @@ public class VehicleSearchController {
         stage.show();
     }
 
+    /**
+     * Функция подключается к базе данных и обновляет каждый раз все значения
+     * в списке vehicleData
+     */
     private void updateDB(){
         ObservableList<Vehicle> carData = FXCollections.observableArrayList();
 
         String sqlRequest = "SELECT * FROM vehicle";
-        try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB)) {
-
-            Statement statement = connectionDB.createStatement();
-            ResultSet queryOutput = statement.executeQuery(sqlRequest);
+        try {
+            connectionDB = null;
+            Class.forName("org.sqlite.JDBC");
+            connectionDB = DriverManager.getConnection(PATHSQLDB);
+            statement = connectionDB.createStatement();
+            statement.execute("CREATE TABLE if not exists 'vehicle' ('id' INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "'brand' VARCHAR(50), 'model' VARCHAR(50), 'category' VARCHAR(50), 'registrationNumber' VARCHAR(15)," +
+                "'typeVehicle' VARCHAR(15), 'year' INT, hasTrailer INT(1));");
+            queryOutput = statement.executeQuery(sqlRequest);
 
             while (queryOutput.next()) {
                 int id = queryOutput.getInt("id");
@@ -180,15 +208,30 @@ public class VehicleSearchController {
                 boolean hasTrailer = queryOutput.getInt("hasTrailer") == 1;
 
                 VehicleFactory vehicleFactory = new VehicleFactory();
-                carData.add(vehicleFactory.createVehicle(typeVehicle, id, brand, model, category, registrationNumber, year, hasTrailer));
 
+                carData.add(vehicleFactory.createVehicle(typeVehicle, id, brand, model, category, registrationNumber, year, hasTrailer));
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+        try {
+            connectionDB.close();
+            statement.close();
+            queryOutput.close();
+        }
+        catch (SQLException e){
+            e.printStackTrace();
+        }
+
         vehicleData = carData;
     }
 
+    /**
+     * Фунция обработчик для поиска значений в таблице
+     * связывает значения введные в поля и обновляет список данных
+     * для года и категории поиск начинается с начального вхожения
+     * для остальных полей поиск по любому вхождению в строке
+     */
     public void findValue(){
         //Поиск по колонкам
         filteredCarData = new FilteredList<>(vehicleData);

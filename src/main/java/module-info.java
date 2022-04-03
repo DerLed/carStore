@@ -5,6 +5,6 @@ module com.example.demo8 {
     requires org.xerial.sqlitejdbc;
 
 
-    opens com.example.demo8 to javafx.fxml;
-    exports com.example.demo8;
+    opens com.example.carStore to javafx.fxml;
+    exports com.example.carStore;
 }

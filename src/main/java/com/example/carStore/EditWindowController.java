@@ -1,25 +1,20 @@
-package com.example.demo8;
+package com.example.carStore;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.util.ResourceBundle;
 
-import static com.example.demo8.Settings.PATHSQLDB;
+import static com.example.carStore.Settings.PATHSQLDB;
 
 public class EditWindowController implements Initializable {
 
@@ -37,23 +32,30 @@ public class EditWindowController implements Initializable {
     private int idUpdate;
     String sql = "";
 
+    /**
+     *В инициализирующем методе окна
+     * производится заполнение выпадающего списка категорий значениями
+     * из enum с категориями
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ObservableList<String> st = FXCollections.observableArrayList();
-        for (TypeVehicle tt : TypeVehicle.values()) {
-            st.add(tt.getType());
+        for (TypeVehicle tv : TypeVehicle.values()) {
+            st.add(tv.getType());
         }
         addTypeVehicleChoiceBox.setItems(st);
     }
 
+    /**
+     * Обработчик кнопки закрытия окна
+     */
     @FXML
     protected void handleCloseButtonAction() {
        closeWindow();
-
     }
 
     @FXML
-    protected void addButtonAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
+    protected void addButtonAction(){
 
         //Получаем значения из текстовых полей
         String brand = addBrandTextField.getText();
@@ -68,11 +70,15 @@ public class EditWindowController implements Initializable {
             year = Integer.parseInt(addYearTextField.getText());
         } catch (NumberFormatException e) {
             //e.printStackTrace();
+            //вывод исключения  не производится
+            //правильно бы было обработать событие и не дать сохранить такую запись
         }
         int hasTrailer = hasTrailerCheckBox.isSelected() ? 1 : 0;
 
 
-        //Добавляем новую запись в БД
+        //Добавляем или обновляем запись в БД
+        //Обновление производится по первичному ключу
+        //сложение строк плохая практикаб, но в данном случает оставил так
         try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB)) {
 
             String updateSql = "UPDATE vehicle SET brand = ?, model = ?, category = ?, " +
@@ -81,16 +87,13 @@ public class EditWindowController implements Initializable {
 
             String addSql = "INSERT INTO 'vehicle' ('brand', 'model', 'category', 'registrationNumber', 'typeVehicle', " +
                     "'year', 'hasTrailer') VALUES (?, ?, ?, ?, ?, ?, ? ) ;";
-
+            //Если окно запущено для редактирования или добавления и выбирается соответствующий SQL запрос
             if (isUpdate)
                 sql = updateSql;
             else
                 sql = addSql;
 
-
             PreparedStatement preparedStatement = connectionDB.prepareStatement(sql);
-
-
             preparedStatement.setString(1, brand);
             preparedStatement.setString(2, model);
             preparedStatement.setString(3, category);
@@ -98,18 +101,16 @@ public class EditWindowController implements Initializable {
             preparedStatement.setString(5, typeVehicle);
             preparedStatement.setInt(6, year);
             preparedStatement.setInt(7, hasTrailer);
-
+            //Проверка совпадения регистрационного знака
+            //Если окно запущено для редактирования то проверка регистрационного знака не производится
             if (!checkRegistrationNumber(registrationNumber) | isUpdate) {
-                int rows = preparedStatement.executeUpdate();
-                System.out.printf("%d rows added", rows);
+                preparedStatement.executeUpdate();
             } else
                 System.out.println("Номер существует");
-
-
+                //Вывод в консоль для отладки
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         closeWindow();
 
     }
@@ -119,7 +120,7 @@ public class EditWindowController implements Initializable {
      */
     private boolean checkRegistrationNumber(String registrationNumber) {
         boolean isRegistrationNumberExist = false;
-        try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB);) {
+        try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB)) {
             String sql = "SELECT registrationNumber FROM vehicle WHERE registrationNumber = ?;";
             PreparedStatement preparedStatement = connectionDB.prepareStatement(sql);
             preparedStatement.setString(1, registrationNumber);
@@ -149,14 +150,13 @@ public class EditWindowController implements Initializable {
         addCategoryTextField.setText(selectRowCar.getCategory());
         addRegistrationNumberTextField.setText(selectRowCar.getRegistrationNumber());
         hasTrailerCheckBox.setSelected(selectRowCar.isHasTrailer());
-//        if(selectRowCar.getYear() == 0) {
-//            addYearTextField.setText("");
-//        }
-//        else
         addYearTextField.setText(String.valueOf(selectRowCar.getYear()));
         addTypeVehicleChoiceBox.setValue(selectRowCar.getTypeVehicle());
     }
 
+    /**
+     * Метод закрытия окна
+     */
     private void closeWindow() {
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();

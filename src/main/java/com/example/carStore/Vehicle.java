@@ -1,4 +1,4 @@
-package com.example.demo8;
+package com.example.carStore;
 
 import java.util.Objects;
 
@@ -19,7 +19,7 @@ public abstract class Vehicle {
                 ", model='" + model + '\'' +
                 ", category='" + category + '\'' +
                 ", registrationNumber='" + registrationNumber + '\'' +
-                //", typeVehicle='" + typeVehicle + '\'' +
+                ", typeVehicle='" + typeVehicle + '\'' +
                 ", year=" + year +
                 ", hasTrailer=" + hasTrailer +
                 '}';
@@ -31,7 +31,6 @@ public abstract class Vehicle {
         this.model = model;
         this.category = category;
         this.registrationNumber = registrationNumber;
-        //this.typeVehicle = TypeVehicle.getTypeByName(typeVehicle);
         this.year = year;
         this.hasTrailer = hasTrailer;
     }
@@ -40,7 +39,7 @@ public abstract class Vehicle {
 
     }
 
-    public int getId() {return id;};
+    public int getId() {return id;}
 
     public String getBrand() {
         return brand;
