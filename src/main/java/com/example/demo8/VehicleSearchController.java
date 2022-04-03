@@ -40,11 +40,11 @@ public class VehicleSearchController implements Initializable {
     public TextField findCategoryTextField;
     public TextField findYearTextField;
     public Button updateButton;
-    private static Car selectRowCar;
+    private static Vehicle selectRowCar;
 
 
     @FXML
-    private TableView<Car> vehicleList;
+    private TableView<Vehicle> vehicleList;
     @FXML
     private TableColumn<Car, String> brandColumn;
     @FXML
@@ -61,35 +61,17 @@ public class VehicleSearchController implements Initializable {
     //private TableColumn<Car, Boolean> hasTrailerColumn;
     private TableColumn<Car, String> hasTrailerColumn;
 
-    private ObservableList<Car> carData = FXCollections.observableArrayList();
-
-    public static Car getSelectRowCar(){
-        return selectRowCar;
-    };
+    private ObservableList<Vehicle> carData = FXCollections.observableArrayList();
 
     @FXML
     protected void addButtonClick() {
-//
-//        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("edit-window.fxml"));
-//        Scene scene = null;
-//        try {
-//            scene = new Scene(fxmlLoader.load(), 600, 400);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//        Stage editWindowStage = new Stage();
-//        editWindowStage.setTitle("Редактирование/Добавление ТС");
-//        editWindowStage.setScene(scene);
-//        editWindowStage.initModality(Modality.APPLICATION_MODAL);
-//        editWindowStage.show();
         CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
-        newWindow.createWindowAddUpdate(new Car());
+        newWindow.createWindowAddUpdate();
 
     }
 
     @FXML
-    protected void updateButtonClick() throws IOException {
+    protected void updateButtonClick() {
         CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
         newWindow.createWindowAddUpdate(selectRowCar);
     }
@@ -113,19 +95,22 @@ public class VehicleSearchController implements Initializable {
                 String model = queryOutput.getString("model");
                 String category = queryOutput.getString("category");
                 String registrationNumber = queryOutput.getString("registrationNumber");
-                String typeVehicle = queryOutput.getString("typeVehicle");
+                TypeVehicle typeVehicle = TypeVehicle.getTypeByName(queryOutput.getString("typeVehicle"));
                 int year = queryOutput.getInt("year");
                 boolean hasTrailer = queryOutput.getInt("hasTrailer") == 1;
 
-                carData.add(new Car(brand, model, category, registrationNumber, typeVehicle, year, hasTrailer));
+                //carData.add(new Car(brand, model, category, registrationNumber, year, hasTrailer));
+                VehicleFactory vehicleFactory = new VehicleFactory();
+                carData.add(vehicleFactory.createVehicle(typeVehicle, brand, model, category, registrationNumber, year, hasTrailer));
 
-                brandColumn.setCellValueFactory(new PropertyValueFactory<Car, String>("brand"));
-                modelColumn.setCellValueFactory(new PropertyValueFactory<Car, String>("model"));
-                categoryColumn.setCellValueFactory(new PropertyValueFactory<Car, String>("category"));
-                registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<Car, String>("registrationNumber"));
-                typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<Car, String>("typeVehicle"));
-                yearColumn.setCellValueFactory(new PropertyValueFactory<Car, Integer>("year"));
-//                hasTrailerColumn.setCellValueFactory(new PropertyValueFactory<Car, Boolean>("hasTrailer"));
+                brandColumn.setCellValueFactory(new PropertyValueFactory<>("brand"));
+                modelColumn.setCellValueFactory(new PropertyValueFactory<>("model"));
+                categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+                registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<>("registrationNumber"));
+                typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
+
+                yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
+//
                 hasTrailerColumn.setCellValueFactory(cellData -> {
                     boolean isHasTrailer = cellData.getValue().isHasTrailer();
                     String hasTrailerAsString;
@@ -138,7 +123,7 @@ public class VehicleSearchController implements Initializable {
             }
 
 //            FilteredList<Car> filteredCarData = new FilteredList<>(carData, b -> true);
-            FilteredList<Car> filteredCarData = new FilteredList<>(carData);
+            FilteredList<Vehicle> filteredCarData = new FilteredList<>(carData);
 
 //            findBrandTextField.textProperty().addListener((observable, oldValue, newValue) ->{
 //                filteredCarData.setPredicate(Car -> {

@@ -1,5 +1,7 @@
 package com.example.demo8;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -27,7 +29,7 @@ public class EditWindowController implements Initializable {
     public TextField addModelTextField;
     public TextField addCategoryTextField;
     public TextField addRegistrationNumberTextField;
-    //public ChoiceBox addTypeVehicleChoiceBox;
+    public ChoiceBox<String> addTypeVehicleChoiceBox;
     public TextField addYearTextField;
     public CheckBox hasTrailerCheckBox;
 
@@ -103,13 +105,23 @@ public class EditWindowController implements Initializable {
         return isRegistrationNumberExist;
     }
 
-    public void setSelectRowCar(Car selectRowCar) {
+    public void setSelectRowCar(Vehicle selectRowCar) {
 
         addBrandTextField.setText(selectRowCar.getBrand());
         addModelTextField.setText(selectRowCar.getModel());
         addCategoryTextField.setText(selectRowCar.getCategory());
         addRegistrationNumberTextField.setText(selectRowCar.getRegistrationNumber());
-        addYearTextField.setText(String.valueOf(selectRowCar.getYear()));
         hasTrailerCheckBox.setSelected(selectRowCar.isHasTrailer());
+        if(selectRowCar.equals(new Car())) {
+            addYearTextField.setText("");
+        }
+        else
+            addYearTextField.setText(String.valueOf(selectRowCar.getYear()));
+        ObservableList<String> st = FXCollections.observableArrayList();
+        for(TypeVehicle tt : TypeVehicle.values()){
+            st.add(tt.getType());
+        }
+        addTypeVehicleChoiceBox.setItems(st);
+        addTypeVehicleChoiceBox.setValue(selectRowCar.getTypeVehicle());
     }
 }

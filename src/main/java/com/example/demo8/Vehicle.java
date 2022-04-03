@@ -1,5 +1,7 @@
 package com.example.demo8;
 
+import java.util.Objects;
+
 public abstract class Vehicle {
     private String brand;
     private String model;
@@ -16,18 +18,18 @@ public abstract class Vehicle {
                 ", model='" + model + '\'' +
                 ", category='" + category + '\'' +
                 ", registrationNumber='" + registrationNumber + '\'' +
-                ", typeVehicle='" + typeVehicle + '\'' +
+                //", typeVehicle='" + typeVehicle + '\'' +
                 ", year=" + year +
                 ", hasTrailer=" + hasTrailer +
                 '}';
     }
 
-    public Vehicle(String brand, String model, String category, String registrationNumber, String typeVehicle, int year, boolean hasTrailer) {
+    public Vehicle(String brand, String model, String category, String registrationNumber, int year, boolean hasTrailer) {
         this.brand = brand;
         this.model = model;
         this.category = category;
         this.registrationNumber = registrationNumber;
-        this.typeVehicle = typeVehicle;
+        //this.typeVehicle = TypeVehicle.getTypeByName(typeVehicle);
         this.year = year;
         this.hasTrailer = hasTrailer;
     }
@@ -52,9 +54,7 @@ public abstract class Vehicle {
         return registrationNumber;
     }
 
-    public String getTypeVehicle() {
-        return typeVehicle;
-    }
+    public abstract String getTypeVehicle();
 
     public int getYear() {
         return year;
@@ -62,5 +62,18 @@ public abstract class Vehicle {
 
     public boolean isHasTrailer() {
         return hasTrailer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vehicle vehicle = (Vehicle) o;
+        return year == vehicle.year && hasTrailer == vehicle.hasTrailer && Objects.equals(brand, vehicle.brand) && Objects.equals(model, vehicle.model) && Objects.equals(category, vehicle.category) && Objects.equals(registrationNumber, vehicle.registrationNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(brand, model, category, registrationNumber, year, hasTrailer);
     }
 }
