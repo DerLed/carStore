@@ -73,32 +73,23 @@ public class VehicleSearchController {
 
     @FXML
     protected void addButtonClick() {
-        //CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
-        //newWindow.createWindowAddUpdate();
         createWindowAddUpdate();
 
     }
 
     @FXML
     protected void updateButtonClick() {
-        //CreateWindowAddUpdate newWindow = new CreateWindowAddUpdate();
-        //newWindow.createWindowAddUpdate(selectRowCar);
         createWindowAddUpdate(selectRowCar);
     }
 
-
     @FXML
     public void initialize() {
-
-
         ObservableList<Vehicle> carData = FXCollections.observableArrayList();
 
         String sqlRequest = "SELECT * FROM vehicle";
         try {
-            //Class.forName("org.sqlite.JDBC");
             Connection connectionDB = DriverManager.getConnection(PATHSQLDB);
             Statement statement = connectionDB.createStatement();
-
             ResultSet queryOutput = statement.executeQuery(sqlRequest);
 
             while (queryOutput.next()) {
@@ -111,7 +102,6 @@ public class VehicleSearchController {
                 int year = queryOutput.getInt("year");
                 boolean hasTrailer = queryOutput.getInt("hasTrailer") == 1;
 
-                //carData.add(new Car(brand, model, category, registrationNumber, year, hasTrailer));
                 VehicleFactory vehicleFactory = new VehicleFactory();
                 carData.add(vehicleFactory.createVehicle(typeVehicle, id, brand, model, category, registrationNumber, year, hasTrailer));
 
@@ -120,9 +110,7 @@ public class VehicleSearchController {
                 categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
                 registrationNumberColumn.setCellValueFactory(new PropertyValueFactory<>("registrationNumber"));
                 typeVehicleColumn.setCellValueFactory(new PropertyValueFactory<>("typeVehicle"));
-
                 yearColumn.setCellValueFactory(new PropertyValueFactory<>("year"));
-
                 hasTrailerColumn.setCellValueFactory(cellData -> {
                     boolean isHasTrailer = cellData.getValue().isHasTrailer();
                     String hasTrailerAsString;
@@ -131,13 +119,10 @@ public class VehicleSearchController {
                     return new ReadOnlyStringWrapper(hasTrailerAsString);
                 });
 
-                //vehicleList.setItems(carData);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
 
 
         //Поиск по колонкам
@@ -156,6 +141,7 @@ public class VehicleSearchController {
                 findRegistrationNumberTextField.textProperty(),
                 findYearTextField.textProperty()
         ));
+
         vehicleList.setItems(filteredCarData);
 
 
@@ -173,8 +159,6 @@ public class VehicleSearchController {
 
                     }
                 });
-
-
     }
 
     private void initWindow() {

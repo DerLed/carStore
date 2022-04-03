@@ -40,7 +40,7 @@ public class EditWindowController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         ObservableList<String> st = FXCollections.observableArrayList();
-        for(TypeVehicle tt : TypeVehicle.values()){
+        for (TypeVehicle tt : TypeVehicle.values()) {
             st.add(tt.getType());
         }
         addTypeVehicleChoiceBox.setItems(st);
@@ -48,17 +48,14 @@ public class EditWindowController implements Initializable {
 
     @FXML
     protected void handleCloseButtonAction() {
-        System.out.println(idUpdate);
-        Stage stage = (Stage) closeButton.getScene().getWindow();
-        stage.close();
+       closeWindow();
+
     }
 
     @FXML
     protected void addButtonAction(ActionEvent actionEvent) throws SQLException, ClassNotFoundException {
 
-
         //Получаем значения из текстовых полей
-
         String brand = addBrandTextField.getText();
         String model = addModelTextField.getText();
         String category = addCategoryTextField.getText();
@@ -67,7 +64,8 @@ public class EditWindowController implements Initializable {
 
         //Проверяем что в поле "Год выпуска" введено число
         int year = 0;
-        try { year = Integer.parseInt(addYearTextField.getText());
+        try {
+            year = Integer.parseInt(addYearTextField.getText());
         } catch (NumberFormatException e) {
             //e.printStackTrace();
         }
@@ -79,16 +77,15 @@ public class EditWindowController implements Initializable {
 
             String updateSql = "UPDATE vehicle SET brand = ?, model = ?, category = ?, " +
                     "registrationNumber = ?, typeVehicle = ?, year = ?, " +
-                    "hasTrailer = ? WHERE id = "+ idUpdate +" ;";
+                    "hasTrailer = ? WHERE id = " + idUpdate + " ;";
 
             String addSql = "INSERT INTO 'vehicle' ('brand', 'model', 'category', 'registrationNumber', 'typeVehicle', " +
                     "'year', 'hasTrailer') VALUES (?, ?, ?, ?, ?, ?, ? ) ;";
 
-            if(isUpdate)
+            if (isUpdate)
                 sql = updateSql;
             else
                 sql = addSql;
-
 
 
             PreparedStatement preparedStatement = connectionDB.prepareStatement(sql);
@@ -105,8 +102,7 @@ public class EditWindowController implements Initializable {
             if (!checkRegistrationNumber(registrationNumber) | isUpdate) {
                 int rows = preparedStatement.executeUpdate();
                 System.out.printf("%d rows added", rows);
-            }
-            else
+            } else
                 System.out.println("Номер существует");
 
 
@@ -114,20 +110,21 @@ public class EditWindowController implements Initializable {
             e.printStackTrace();
         }
 
-        
+        closeWindow();
+
     }
 
     /**
      * Функция проверки совпадения регистрационного номера
      */
-    private boolean checkRegistrationNumber(String registrationNumber){
+    private boolean checkRegistrationNumber(String registrationNumber) {
         boolean isRegistrationNumberExist = false;
         try (Connection connectionDB = DriverManager.getConnection(PATHSQLDB);) {
             String sql = "SELECT registrationNumber FROM vehicle WHERE registrationNumber = ?;";
             PreparedStatement preparedStatement = connectionDB.prepareStatement(sql);
             preparedStatement.setString(1, registrationNumber);
             ResultSet queryOutput = preparedStatement.executeQuery();
-            if (queryOutput.next()){
+            if (queryOutput.next()) {
                 isRegistrationNumberExist = true;
             }
         } catch (SQLException e) {
@@ -159,4 +156,10 @@ public class EditWindowController implements Initializable {
         addYearTextField.setText(String.valueOf(selectRowCar.getYear()));
         addTypeVehicleChoiceBox.setValue(selectRowCar.getTypeVehicle());
     }
+
+    private void closeWindow() {
+        Stage stage = (Stage) closeButton.getScene().getWindow();
+        stage.close();
+    }
 }
+
