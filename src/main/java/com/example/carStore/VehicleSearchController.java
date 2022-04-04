@@ -125,8 +125,6 @@ public class VehicleSearchController {
                     } else {
                         updateButton.setDisable(false);
                         selectRowCar = newValue;
-                        System.out.println(newValue.getModel());
-
                     }
                 });
     }
